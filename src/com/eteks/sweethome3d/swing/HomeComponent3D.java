@@ -1317,11 +1317,24 @@ public class HomeComponent3D extends JComponent implements com.eteks.sweethome3d
           if (isEnabled()) {
             // Mouse wheel changes camera location 
             float delta = -2.5f * ev.getWheelRotation();
-            // Multiply delta by 10 if shift is down
-            if (ev.isShiftDown()) {
+            // If meta key is pressed, move faster
+            if (ev.isMetaDown()) {
               delta *= 5;
-            } 
-            controller.moveCamera(delta);
+            }
+            /* Trackpad / 2D-scroll wheel *horizontal* scroll events are presented in AWT as scroll with shift press.
+             * Use this as a handy way to be able to change the camera's *elevation* from the trackpad.
+             * (We can already change angle and 2D position, so this gives us total control of exploration via trackpad.)
+             * 
+             * Movements are, for summary:
+             * * up/down: forwards/backwards (in the plane where the camera is located)
+             * * left/right (or shift up/down): up/down (change the plane where the camera is located)
+             * * meta plus above: same thing but faster 
+             */
+            if (ev.isShiftDown()) {
+              controller.elevateCamera(-delta);
+            } else {
+              controller.moveCamera(delta);
+            }
           }
         }
       };
